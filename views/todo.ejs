@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>todo App</title>
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <link rel="stylesheet" href="assets/common.css">
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <header>
+        <form action="">
+            <input type="text" placeholder="请输入内容" name="item" id="item">
+            <button type="submit" id="add">
+                <img src="images/add.png" alt="+">
+            </button>
+        </form>
+    </header>
+    <div class="container">
+        <!-- 未完成列表 -->
+        <ul id="todo" class="todo">
+            <% todos.forEach(function(item){%>
+            <li>
+                <p><%= item.txt %></p>
+                <div class="right">
+                    <img class="delete" src="images/delete.png" alt="delete" entrance="1" data-id="<%= item.id%>">
+                    <span class="line"></span>
+                    <img class="finish unfinish" src="images/unfinish.png"  data-id="<%= item.id%>">
+                </div>
+            </li>
+            <%})%>
+        </ul>
+        <% if(completes.length){%>
+        <div >以下是已完成事项</div>
+        <%}%>
+        <!-- 已完成列表 -->
+        <ul id="completed" class="todo">
+            <% completes.forEach(function(item){%>
+            <li>
+                <p><%= item.txt %></p>
+                <div class="right">
+                    <img class="delete" src="images/delete.png" alt="delete" entrance="2" data-id="<%= item.id%>">
+                    <span class="line"></span>
+                    <img class="finish" src="images/finish.png">
+                </div>
+            </li>
+            <%})%>
+        </ul>
+        <% if(!todos.length && !completes.length){%>
+        <div >暂时没有内容哦~</div>
+        <%}%>
+    </div>
+    <script>
+        $(document).ready(function(){
+            $("header").on('submit',function(){
+                var todo = { txt:$("#item").val()};
+                if(todo.txt==''){
+                    alert("内容不能为空哦~");
+                    return;
+                }
+                //发送数据请求
+                $.ajax({
+                    type:'POST',
+                    url:'/',
+                    data:todo,
+                    success:function(data){
+
+                    }
+                })
+            })
+            //删除数据
+            $(".delete").click(function(){
+                var entrance = $(this).attr('entrance');
+                var id = $(this).attr('data-id');
+                $.ajax({
+                    type:'DELETE',
+                    url:'/'+id+'/'+entrance,
+                    success:function(data){
+                        location.reload();
+                    }
+                })
+            })
+            //完成
+            $(".unfinish").click(function(){
+                var id = $(this).attr('data-id');
+                $.ajax({
+                    type:'POST',
+                    url:'/finish',
+                    data:{id:id},
+                    success:function(data){
+                        location.reload();
+                    }
+                })
+            })
+        })
+    </script>
+</body>
+</html>
